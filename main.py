@@ -9,6 +9,7 @@ import concurrent.futures
 import hashlib
 import shlex
 import math
+import platform
 
 # Initialize colorama (ANSI color codes)
 init(autoreset=True)
@@ -223,12 +224,23 @@ def embed_caption(video_path, srt_path, output_path):
     srt_path_ffmpeg = srt_path.replace(os.sep, '/').replace(':', '\\:')
     vf_filter = f"subtitles={shlex.quote(srt_path_ffmpeg)}:charenc=UTF-8"
 
-    comando = [
-        "ffmpeg", "-hwaccel", "cuda", "-i", video_path,
-        "-vf", vf_filter,
-        "-c:v", "h264_nvenc", "-preset", "fast", "-b:v", "5M",
-        "-c:a", "copy", output_path
-    ]
+    system = platform.system().lower()
+    if system == "windows":
+        comando = [
+            "ffmpeg", "-hwaccel", "cuda", "-i", video_path,
+            "-vf", vf_filter,
+            "-c:v", "h264_nvenc", "-preset", "fast", "-b:v", "5M",
+            "-c:a", "copy", output_path
+        ]
+    else:
+        # For macOS and Linux, use libx264 (CPU)
+        comando = [
+            "ffmpeg", "-i", video_path,
+            "-vf", vf_filter,
+            "-c:v", "libx264", "-preset", "fast", "-b:v", "5M",
+            "-c:a", "copy", output_path
+        ]
+
     log_info(f"Embedding subtitles in {output_path}...")
     subprocess.run(comando)
     log_success("Embedded subtitle successful!")
