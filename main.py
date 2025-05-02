@@ -232,8 +232,16 @@ def embed_caption(video_path, srt_path, output_path):
             "-c:v", "h264_nvenc", "-preset", "fast", "-b:v", "5M",
             "-c:a", "copy", output_path
         ]
+    elif system == "darwin":
+        # macOS: use VideoToolbox (Apple Silicon or Intel)
+        comando = [
+            "ffmpeg", "-i", video_path,
+            "-vf", vf_filter,
+            "-c:v", "h264_videotoolbox", "-b:v", "5M",
+            "-c:a", "copy", output_path
+        ]
     else:
-        # For macOS and Linux, use libx264 (CPU)
+        # Linux fallback
         comando = [
             "ffmpeg", "-i", video_path,
             "-vf", vf_filter,
