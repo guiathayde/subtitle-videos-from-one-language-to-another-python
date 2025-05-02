@@ -1,5 +1,4 @@
 colorama==0.4.6
-googletrans==4.0.0rc1
 openai_whisper==20240930
-torch==2.6.0+cu118
+torch==2.6.0
 transformers==4.51.3
